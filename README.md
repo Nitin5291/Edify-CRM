@@ -1,1 +1,1 @@
-# Edify-CRM
+# skillcapital-crm
