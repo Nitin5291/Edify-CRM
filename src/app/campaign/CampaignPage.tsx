@@ -375,7 +375,7 @@ const CampaignPage = ({
                     onGridReady={onGridReady}
                     animateRows={true}
                     suppressRowClickSelection={true}
-                    overlayNoRowsTemplate={"Leads data no found"}
+                    overlayNoRowsTemplate={"Campaigns data no found"}
                     onFirstDataRendered={onFirstDataRendered}
                     paginationNumberFormatter={paginationNumberFormatter}
                   />
