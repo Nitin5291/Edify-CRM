@@ -57,17 +57,24 @@ export async function GET(req: NextRequest) {
 
     if (batchDetails.length === 0) {
       return NextResponse.json(
-        { message: "No batch details found" },
+        { message: "No batch details found", trainers: [] },
         { status: 404 }
       );
     }
 
     // Extract unique trainer IDs (excluding null/undefined)
+    // const trainerIds = Array.from(
+    //   new Set(batchDetails.map((batch) => batch.trainerId).filter(Boolean))
+    // );
     const trainerIds = Array.from(
-      new Set(batchDetails.map((batch) => batch.trainerId).filter(Boolean))
+      new Set(
+        batchDetails
+          .map((batch) => batch.trainerId)
+          .filter((id): id is number => id !== null && id !== undefined) // Ensure only numbers are kept
+      )
     );
 
-    let trainerDetails : any;
+    let trainerDetails: any;
     if (trainerIds.length > 0) {
       // Fetch trainer details
       trainerDetails = await db

@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     if (batchIds.length === 0) {
       return NextResponse.json(
-        { message: "No valid batch IDs found" },
+        { message: "No valid batch IDs found", batchDetails: [] },
         { status: 404 }
       );
     }
@@ -52,14 +52,21 @@ export async function GET(req: NextRequest) {
 
     if (batchDetails.length === 0) {
       return NextResponse.json(
-        { message: "No batch details found" },
+        { message: "No batch details found", batchDetails: [] },
         { status: 404 }
       );
     }
 
     // Get unique trainer IDs from batch details
+    // const trainerIds = Array.from(
+    //   new Set(batchDetails.map((batch) => batch.trainerId).filter(Boolean))
+    // );
     const trainerIds = Array.from(
-      new Set(batchDetails.map((batch) => batch.trainerId).filter(Boolean))
+      new Set(
+        batchDetails
+          .map((batch) => batch.trainerId)
+          .filter((id): id is number => id !== null && id !== undefined) // Ensure only numbers are kept
+      )
     );
 
     // Fetch trainer names
@@ -78,7 +85,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        batchDetails: batchDetails.map((batch) => ({
+        batchDetails: batchDetails.map((batch: any) => ({
           ...batch,
           id: String(batch.id), // Ensure ID remains string
           trainerName: trainerMap.get(batch.trainerId) || "Unknown", // Add trainerName
