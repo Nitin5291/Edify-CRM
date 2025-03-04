@@ -214,6 +214,7 @@ const LearnerPage = () => {
               <AgGridReact
                 ref={tableRef}
                 rowData={batchLearner}
+                // rowData={batchLearner?.map((item:any) => {return item?.learners})}
                 // rowData={dummyData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

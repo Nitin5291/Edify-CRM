@@ -43,9 +43,9 @@ const LearnerTrainerForm = () => {
     return { lable: item?.name, value: item?.id };
   });
 
-  useEffect(() => {
-    dispatch(getCourses());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getCourses());
+  // }, []);
 
   const handelOnChange = (
     e: { target: { name: String; value: String } },

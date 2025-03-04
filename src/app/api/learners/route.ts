@@ -1,25 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { learners, learnersBatches } from "@/drizzle/schema";
-import { eq, and, desc, gte, lte } from "drizzle-orm";
-import { uploadFile } from "./../utils/upload"
+import { eq, and, desc, gte, lte, inArray } from "drizzle-orm";
+import { uploadFile, deleteFile } from "./../utils/upload";
 import { parseISO } from "date-fns";
 
 export async function POST(req: NextRequest) {
   try {
-    const formData : any = await req.formData();
-    const batchIds = JSON.parse((formData.get("batchIds") as string) || "[]");
+    const formData: any = await req.json();
 
-    const learnerData: any = {};
-
-    for (const entry of formData.entries()) {
-      const [key, value] = entry;
-      if (value instanceof File) {
-        learnerData[key] = await uploadFile(value, `${key}s`);
-      } else {
-        learnerData[key] = value;
-      }
-    }
+    const learnerData: any = formData;
 
     // Convert date fields to Date objects
     if (learnerData.dateOfBirth)
@@ -29,20 +19,8 @@ export async function POST(req: NextRequest) {
     if (learnerData.dueDate)
       learnerData.dueDate = new Date(learnerData.dueDate);
 
-    // Save batchIds in learners table
-    learnerData.batchId = JSON.stringify(batchIds);
-
     // Insert learner data
     const [learner] = await db.insert(learners).values(learnerData).returning();
-
-    // Insert batch associations
-    if (learner && batchIds.length > 0) {
-      const batchAssociations = batchIds.map((batchId: string) => ({
-        learnerId: learner.id,
-        batchId,
-      }));
-      await db.insert(learnersBatches).values(batchAssociations);
-    }
 
     return NextResponse.json(learner, { status: 201 });
   } catch (error) {
@@ -54,88 +32,121 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// export async function PUT(req: NextRequest) {
+//   try {
+//     const { searchParams } = new URL(req.url);
+//     const id = searchParams.get("id");
+
+//     if (!id) {
+//       return NextResponse.json(
+//         { message: "Learner ID is required" },
+//         { status: 400 }
+//       );
+//     }
+
+//     const learnerId = Number(id);
+
+//     // Check if learner exists
+//     const existingLearner: any = await db
+//       .select()
+//       .from(learners)
+//       .where(eq(learners.id, learnerId))
+//       .limit(1);
+
+//     if (!existingLearner.length) {
+//       return NextResponse.json(
+//         { message: "Learner not found" },
+//         { status: 404 }
+//       );
+//     }
+
+//     const formData: any = await req.formData();
+//     const learnerData: any = {};
+//     const deleteImagePromises: Promise<void>[] = [];
+
+//     for (const entry of formData.entries()) {
+//       const [key, value] = entry;
+
+//       if (value?.constructor?.name === "File") {
+//         // New file uploaded, delete the old one first
+//         if (["idProof", "instalment1Screenshot"].includes(key)) {
+//           const oldImageUrl: any = existingLearner[0][key];
+//           if (oldImageUrl) {
+//             deleteImagePromises.push(
+//               deleteFile(oldImageUrl)
+//                 .then(() => {})
+//                 .catch((error) =>
+//                   console.error(
+//                     `Error deleting old image ${oldImageUrl}:`,
+//                     error
+//                   )
+//                 )
+//             );
+//           }
+//         }
+
+//         // Upload new file
+//         const uploadedFile = await uploadFile(value, `${key}s`);
+//         if (uploadedFile) learnerData[key] = uploadedFile; // Store new image URL
+//       } else {
+//         learnerData[key] = value;
+//       }
+//     }
+
+//     // Convert date fields to Date objects
+//     if (learnerData.dateOfBirth)
+//       learnerData.dateOfBirth = new Date(learnerData.dateOfBirth);
+//     if (learnerData.registeredDate)
+//       learnerData.registeredDate = new Date(learnerData.registeredDate);
+//     if (learnerData.dueDate)
+//       learnerData.dueDate = new Date(learnerData.dueDate);
+
+//     // Update learner details in DB
+//     await db
+//       .update(learners)
+//       .set(learnerData)
+//       .where(eq(learners.id, learnerId));
+
+//     // Handle batch associations
+//     if (formData.has("batchIds")) {
+//       const batchIds = JSON.parse((formData.get("batchIds") as string) || "[]");
+//       await db
+//         .delete(learnersBatches)
+//         .where(eq(learnersBatches.learnerId, learnerId));
+
+//       if (batchIds.length > 0) {
+//         const newBatchAssociations = batchIds.map((batchId: any) => ({
+//           learnerId,
+//           batchId,
+//         }));
+//         await db.insert(learnersBatches).values(newBatchAssociations);
+//       }
+//     }
+
+//     // Delete old images asynchronously after DB update
+//     await Promise.all(deleteImagePromises);
+
+//     // Fetch updated learner data
+//     const updatedLearner = await db
+//       .select()
+//       .from(learners)
+//       .where(eq(learners.id, learnerId))
+//       .limit(1);
+
+//     return NextResponse.json({
+//       message: "Learner updated successfully",
+//       updatedLearner: updatedLearner[0],
+//     });
+//   } catch (error) {
+//     console.error("Error updating learner:", error);
+//     return NextResponse.json(
+//       { message: "Error updating learner", error: error },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function PUT(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id: any = searchParams.get("id");
-    if (!id)
-      return NextResponse.json(
-        { message: "Learner ID is required" },
-        { status: 400 }
-      );
-
-    // Check if learner exists
-    const existingLearner = await db
-      .select()
-      .from(learners)
-      .where(eq(learners.id, id))
-      .limit(1);
-
-    if (!existingLearner.length) {
-      return NextResponse.json(
-        { message: "Learner not found" },
-        { status: 404 }
-      );
-    }
-
-    const formData: any = await req.formData();
-    const learnerData: any = {};
-
-    for (const entry of formData.entries()) {
-      const [key, value] = entry;
-      if (value instanceof File) {
-        const uploadedFile = await uploadFile(value, `${key}s`);
-        if (uploadedFile) learnerData[key] = uploadedFile;
-      } else {
-        learnerData[key] = value;
-      }
-    }
-
-    // Convert date fields to Date objects
-    if (learnerData.dateOfBirth)
-      learnerData.dateOfBirth = new Date(learnerData.dateOfBirth);
-    if (learnerData.registeredDate)
-      learnerData.registeredDate = new Date(learnerData.registeredDate);
-    if (learnerData.dueDate)
-      learnerData.dueDate = new Date(learnerData.dueDate);
-
-    // Update learner details
-    await db.update(learners).set(learnerData).where(eq(learners.id, id));
-
-    // Handle batch associations
-    if (formData.has("batchIds")) {
-      const batchIds = JSON.parse((formData.get("batchIds") as string) || "[]");
-      await db.delete(learnersBatches).where(eq(learnersBatches.learnerId, id));
-      if (batchIds.length > 0) {
-        const newBatchAssociations = batchIds.map((batch: any) => ({
-          learnerId: id,
-          batchId: batch,
-        }));
-        await db.insert(learnersBatches).values(newBatchAssociations);
-      }
-    }
-
-    // Fetch the updated learner data
-    const updatedLearner = await db
-      .select()
-      .from(learners)
-      .where(eq(learners.id, id))
-      .limit(1);
-
-    return NextResponse.json({
-      message: "Learner updated successfully",
-      updatedLearner: updatedLearner[0],
-    });
-  } catch (error) {
-    console.error("Error updating learner:", error);
-    return NextResponse.json(
-      { message: "Error updating learner" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -147,24 +158,172 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const result = await db
-      .delete(learners)
-      .where(eq(learners.id, Number(id)))
-      .returning();
+    const learnerId = Number(id);
 
-    if (!result.length) {
+    // Check if learner exists
+    const existingLearner: any = await db
+      .select()
+      .from(learners)
+      .where(eq(learners.id, learnerId))
+      .limit(1);
+
+    if (!existingLearner.length) {
       return NextResponse.json(
         { message: "Learner not found" },
         { status: 404 }
       );
     }
 
+    const formData: any = await req.formData();
+    const learnerData: any = {};
+    const deleteImagePromises: Promise<void>[] = [];
+
+    for (const entry of formData.entries()) {
+      const [key, value] = entry;
+
+      if (value?.constructor?.name === "File") {
+        // New file uploaded, delete the old one first
+        if (["idProof", "instalment1Screenshot"].includes(key)) {
+          const oldImageUrl: any = existingLearner[0][key];
+          if (oldImageUrl) {
+            deleteImagePromises.push(
+              deleteFile(oldImageUrl)
+                .then(() => {})
+                .catch((error) =>
+                  console.error(
+                    `Error deleting old image ${oldImageUrl}:`,
+                    error
+                  )
+                )
+            );
+          }
+        }
+
+        // Upload new file
+        const uploadedFile = await uploadFile(value, `${key}s`);
+        if (uploadedFile) learnerData[key] = uploadedFile; // Store new image URL
+      } else {
+        // Convert date fields properly
+        if (["dateOfBirth", "registeredDate", "dueDate"].includes(key)) {
+          const dateValue = new Date(value);
+          if (!isNaN(dateValue.getTime())) {
+            learnerData[key] = dateValue; // Save valid date
+          }
+        } else {
+          learnerData[key] = value;
+        }
+      }
+    }
+
+    if (Object.keys(learnerData).length === 0) {
+      return NextResponse.json(
+        { message: "No fields provided for update" },
+        { status: 400 }
+      );
+    }
+
+    // Update learner details in DB
+    await db
+      .update(learners)
+      .set(learnerData)
+      .where(eq(learners.id, learnerId));
+
+    // Handle batch associations
+    if (formData.has("batchIds")) {
+      const batchIds = JSON.parse((formData.get("batchIds") as string) || "[]");
+      await db
+        .delete(learnersBatches)
+        .where(eq(learnersBatches.learnerId, learnerId));
+
+      if (batchIds.length > 0) {
+        const newBatchAssociations = batchIds.map((batchId: any) => ({
+          learnerId,
+          batchId,
+        }));
+        await db.insert(learnersBatches).values(newBatchAssociations);
+      }
+    }
+
+    // Delete old images asynchronously after DB update
+    await Promise.all(deleteImagePromises);
+
+    // Fetch updated learner data
+    const updatedLearner = await db
+      .select()
+      .from(learners)
+      .where(eq(learners.id, learnerId))
+      .limit(1);
+
     return NextResponse.json({
-      message: "Learner deleted successfully",
-      deletedId: Number(id),
+      message: "Learner updated successfully",
+      updatedLearner: updatedLearner[0],
+    });
+  } catch (error) {
+    console.error("Error updating learner:", error);
+    return NextResponse.json(
+      { message: "Error updating learner", error: error },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const idsParam = searchParams.get("ids");
+
+    if (!idsParam) {
+      return NextResponse.json(
+        { message: "Learner IDs are required" },
+        { status: 400 }
+      );
+    }
+
+    // Parse IDs from query parameter and filter out invalid values
+    const ids = idsParam
+      .split(",")
+      .map(Number)
+      .filter((id) => !isNaN(id));
+
+    if (ids.length === 0) {
+      return NextResponse.json(
+        { message: "No valid learner IDs provided" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch existing learners before deleting
+    const existingLearners = await db
+      .select()
+      .from(learners)
+      .where(inArray(learners.id, ids));
+
+    if (existingLearners.length === 0) {
+      return NextResponse.json(
+        { message: "No learners found with the provided IDs" },
+        { status: 404 }
+      );
+    }
+
+    // Collect image URLs to delete
+    const imagesToDelete = existingLearners
+      .flatMap((learner) => [learner.instalment1Screenshot, learner.idProof])
+      .filter((url) => url); // Remove null or undefined URLs
+
+    // Delete learners from the database
+    await db.delete(learners).where(inArray(learners.id, ids));
+
+    // Delete associated images from storage
+    const deletePromises = imagesToDelete.map((url : any) => deleteFile(url));
+    await Promise.all(deletePromises);
+
+    return NextResponse.json({
+      message: "Learners and associated images deleted successfully",
+      deletedIds: ids,
     });
   } catch (error: any) {
-    console.error("Error deleting Learner:", error);
+    console.error("Error deleting learners:", error);
     return NextResponse.json(
       { message: "Internal server error", error: error.message },
       { status: 500 }
@@ -211,7 +370,15 @@ export async function GET(req: NextRequest) {
 
     const result = await query;
 
-    return NextResponse.json({ learners: id ? result?.[0] : result });
+    // **Fix: Properly format batchId before sending response**
+    const formattedResult = result.map((learner) => ({
+      ...learner,
+      batchId: learner.batchId ? learner.batchId.replace(/^"|"$/g, "") : null, // Remove surrounding quotes
+    }));
+
+    return NextResponse.json({
+      learners: id ? formattedResult?.[0] : formattedResult,
+    });
   } catch (error: any) {
     console.error("Error fetching learners:", error);
     return NextResponse.json(
@@ -220,3 +387,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

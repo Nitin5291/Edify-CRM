@@ -127,7 +127,7 @@ export const batches = pgTable("batches", {
   owner: varchar("owner", { length: 255 }),
   batchOwner: varchar("batch_owner", { length: 255 }),
   description: text("description"),
-  userId: integer("user_id"),
+  userId: text("user_id"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -141,17 +141,20 @@ export const learners = pgTable("learners", {
   email: varchar("email", { length: 255 }),
   registeredDate: timestamp("registered_date"),
   location: varchar("location", { length: 255 }),
-  batchId: jsonb("batch_id").default(sql`'[]'::jsonb`), // Array of batch IDs
+  batchId: text("batch_id"),
   source: varchar("source", { length: 255 }),
   description: text("description"),
   totalFees: varchar("total_fees", { length: 255 }),
-  modeOfInstallmentPayment: varchar("mode_of_installment_payment", { length: 255}),
+  modeOfInstallmentPayment: varchar("mode_of_installment_payment", {
+    length: 255,
+  }),
   feesPaid: varchar("fees_paid", { length: 255 }),
   instalment1Screenshot: varchar("instalment1_screenshot", { length: 255 }),
   dueAmount: varchar("due_amount", { length: 255 }),
   dueDate: timestamp("due_date"),
   status: varchar("status", { length: 50 }).default("Upcoming"),
   userId: text("user_id"),
+  countryCode: text("country_code"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -313,4 +316,36 @@ export const calls = pgTable("calls", {
   filename: varchar("filename", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+
+export const trainers = pgTable("trainers", {
+  id: serial("id").primaryKey(),
+  trainerName: varchar("trainer_name", { length: 255 }),
+  trainerOwner: varchar("trainer_owner", { length: 255 }),
+  description: text("description"),
+  idProof: varchar("id_proof", { length: 255 }),
+  trainerStatus: varchar("trainer_status", { length: 255 }).default("Active"),
+  freeSlots: jsonb("free_slots").default(sql`'[]'::jsonb`),
+  techStack: varchar("tech_stack", { length: 255 }),
+  phone: varchar("phone", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  location: varchar("location", { length: 255 }),
+  batches: varchar("batches", { length: 255 }),
+  slackStage: varchar("slack_stage", { length: 255 }),
+  trainerId: varchar("trainer_id", { length: 255 }),
+  joiningDate: timestamp("joining_date"),
+  working: varchar("working", { length: 255 }),
+  commercialNote: varchar("commercial_note", { length: 255 }),
+  trainerNote: varchar("trainer_note", { length: 255 }),
+  userId: text("user_id"),
+  countryCode: text("country_code"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Define the Batch_Lead table (junction table)
+export const batch_lead = pgTable("batch_lead", {
+  batchId: integer("batch_id").notNull(),
+  leadId: integer("lead_id").notNull(),
 });

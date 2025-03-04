@@ -23,14 +23,15 @@ const EditBatch = ({
 }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<String>("Details");
-  const { SingleBatch } = useAppSelector((state) => state?.batch);
+  let { SingleBatch } = useAppSelector((state) => state?.batch);
+  SingleBatch = SingleBatch?.data
   console.log("🚀 ~ SingleBatch:", SingleBatch)
 
   useMemo(() => {
     if (batche?.[0]?.id) {
       dispatch(getSingleBatch(batche?.[0]?.id));
       dispatch(getBatchByLearner(batche?.[0]?.id));
-      dispatch(getUser("salesperson"));
+      // dispatch(getUser("salesperson"));
     }
   }, [batche?.[0]?.id]);
 
@@ -62,7 +63,7 @@ const EditBatch = ({
           <div className="min-w-48 mb-2">
             <p className="text-black mb-1 text-lg font-medium">Trainer</p>
             <span className="text-sky-600 text-sm font-semibold flex gap-1.5">
-              {SingleBatch?.trainer?.trainerName}
+              {SingleBatch?.trainerName}
             </span>
           </div>
           <div className="min-w-48 mb-2">
@@ -171,7 +172,8 @@ const EditBatch = ({
         <div className="py-5">
           {activeTab === "Details" ? (
             <BatchDetail handelOnSet={handelOnSet} />
-          ) : activeTab === "Learners" ? <LearnerPage />
+          ) : activeTab === "Learners" ?
+            <LearnerPage />
             : activeTab === "Activity" ? (
               <Activity />
             ) : activeTab === "Topic" ? (

@@ -14,6 +14,7 @@ import { getCourses } from "@/lib/features/courses/coursesSlice";
 import MultiSelectDropdown from "../component/MultiSelectDropdown";
 import { toast } from "react-toastify";
 import { createLearner, getLearner } from "@/lib/features/learner/learnerSlice";
+import { getUserID } from "@/assets/utils/auth.util";
 
 const CreateLearner = ({
   handelOnContactModel,
@@ -23,12 +24,13 @@ const CreateLearner = ({
   handelOnContactModel: () => void;
 }) => {
   const [learner, setLearner] =
-    useState<OpportunitiyData1>({});
+    useState<OpportunitiyData1>({ countryCode: "91" });
+  console.log("🚀 ~ learner:", learner)
   const [error, setError] = useState<OpportunitiyData1>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const { batchData } = useAppSelector((state) => state?.batch);
-  console.log("🚀 ~ batchData:", batchData)
+  let { batchData } = useAppSelector((state) => state?.batch);
+  batchData = batchData?.data
 
   useEffect(() => {
     dispatch(getLearner());
@@ -89,15 +91,17 @@ const CreateLearner = ({
       const data = {
         name: learner?.name ? learner?.name : null,
         batchId: learner?.batchId?.length > 0
-          ? learner?.batchId?.map((item: any) => {
+          ? `${learner?.batchId?.map((item: any) => {
             return item?.value;
-          })
+          })?.join()}`
           : null,
         phone: learner?.phone ? learner?.phone : null,
         registeredDate: learner?.registeredDate ? learner?.registeredDate : null,
         email: learner?.email ? learner?.email : null,
         location: learner?.location ? learner?.location : null,
         description: learner?.description ? learner?.description : null,
+        countryCode: learner?.countryCode ? learner?.countryCode : '91',
+        userId: getUserID(),
         // lastName: learner?.lastName ? learner?.lastName : null,
         // visitedStage: learner?.visitedStage ? learner?.visitedStage : null,
         // phone: learner?.phone ? learner?.phone : null,
@@ -131,6 +135,7 @@ const CreateLearner = ({
         //   }
         // ],
       };
+      console.log("🚀 ~ handelOnSubmit ~ data:", data)
       dispatch(createLearner(data))
         .unwrap()
         .then((res: any) => {
@@ -176,9 +181,11 @@ const CreateLearner = ({
                 <CustomInput
                   onChange={handelOnChang}
                   lableValue={item?.lableValue}
-                  value={learner?.[item?.name]}
-                  error={error[item?.name]}
+                  error={error[item?.name] || error[item?.name1]}
                   name={item?.name}
+                  name1={item?.name1}
+                  value={learner?.[item?.name]}
+                  value1={learner?.[item?.name1]}
                   mandatory={item?.mandatory}
                   // placeholder={item?.placeholder}
                   typeValue={item?.typeValue}

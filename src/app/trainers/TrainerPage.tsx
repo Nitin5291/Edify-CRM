@@ -206,7 +206,7 @@ const TrainerPage = ({
 
   const handelOnContactModel = () => {
     dispatch(CreateLeadeStatus(!nav?.LeadStatus));
-    dispatch(getUser("salesperson"));
+    dispatch(getUser());
   };
 
   const handelOnSave = () => {
@@ -308,7 +308,7 @@ const TrainerPage = ({
             ...item,
           })),
           searchValue,
-          ["name", "techStack", "phone", "classMode", "leadStatus"]
+          ["trainerName","name", "techStack", "phone", "classMode", "leadStatus"]
         );
       } else {
         return filtetData;

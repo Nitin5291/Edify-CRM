@@ -22,17 +22,18 @@ const CreateTrainer = ({
   handelOnContactModel: () => void;
 }) => {
   const [trainer, setTrainer] = useState<BatchData>({});
+  console.log("🚀 ~ trainer:", trainer)
   const [error, setError] = useState<BatchData>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { allUser } = useAppSelector((state) => state?.auth);
 
   const TrainerData: HostItem[] = allUser?.users?.map((item: any) => {
-    return { lable: item?.name, value: item?.id };
+    return { lable: item?.user_metadata?.name, value: item?.id };
   });
 
   useEffect(() => {
-    dispatch(getUser("trainer"));
+    dispatch(getUser());
     handelOnStaticData();
   }, []);
 
@@ -119,7 +120,9 @@ const CreateTrainer = ({
         trainerStatus: trainer?.trainerStatus ? trainer?.trainerStatus : null,
         phone: trainer?.phone ? trainer?.phone : null,
         location: trainer?.location ? trainer?.location : null,
-        description: trainer?.description ? trainer?.description : null,  
+        description: trainer?.description ? trainer?.description : null,
+        countryCode: trainer?.countryCode ? trainer?.countryCode : "91",
+        userId: getUserID()
 
         // trainerOwner: trainer?.trainerOwner ? trainer?.trainerOwner : null,
         // freeSlots: trainer?.freeSlots ? trainer?.freeSlots : null,
@@ -132,6 +135,7 @@ const CreateTrainer = ({
       dispatch(createTrainer(data))
         .unwrap()
         .then((res: any) => {
+          debugger
           if (res) {
             toast.success(
               res?.message
@@ -183,8 +187,10 @@ const CreateTrainer = ({
                 onChange={handelOnChang}
                 lableValue={item?.lableValue}
                 value={item?.name === "idProof" ? trainer[item?.name]?.name : trainer[item?.name]}
-                error={error[item?.name]}
                 name={item?.name}
+                name1={item?.name1}
+                value1={trainer?.[item?.name1]}
+                error={error?.[item?.name] || error?.[item?.name1]}
                 mandatory={item?.mandatory}
                 placeholder={item?.placeholder}
                 typeValue={item?.typeValue}

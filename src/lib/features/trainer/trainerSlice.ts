@@ -1,5 +1,6 @@
 import { del, get, post, postFormData, put, putFormData } from "@/base";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface TrainerState {
   loading: "idle" | "pending" | "fulfilled" | "rejected";
@@ -25,7 +26,11 @@ export const createTrainer = createAsyncThunk(
   "createtrainer",
   async (body: any) => {
     try {
-      const response = await postFormData("trainers", body);
+      const response = await axios.post("/api/trainers", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
@@ -35,8 +40,8 @@ export const createTrainer = createAsyncThunk(
 
 export const getTrainer = createAsyncThunk("gettrainer", async () => {
   try {
-    const response = await get(`trainers`);
-    return response;
+    const response = await axios.get(`/api/trainers`);
+    return response?.data;
   } catch (error: any) {
     throw new Error(error.response.data);
   }
@@ -46,8 +51,8 @@ export const getFilterTrainer = createAsyncThunk(
   "getFiltertrainer",
   async ({ data }: { data?: string }) => {
     try {
-      const response = await get(`trainers?${data}`);
-      return response;
+      const response = await axios.get(`/api/trainers?${data}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -58,8 +63,8 @@ export const getBatchesTrainer = createAsyncThunk(
   "getBatchesTrainer",
   async (id: number) => {
     try {
-      const response = await get(`batches?trainerId=${id}`);
-      return response;
+      const response = await axios.get(`/api/trainers/batches?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -70,8 +75,12 @@ export const updateTrainer = createAsyncThunk(
   "updateTrainer",
   async (data: any) => {
     try {
-      const response = await putFormData(`trainers/${data?.id}`, data?.data);
-      return response;
+      const response = await axios.put(`/api/trainers?id=${data?.id}`, data?.data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -82,8 +91,8 @@ export const deleteTrainersData = createAsyncThunk(
   "/deleteTrainersData",
   async (ids: any) => {
     try {
-      const response = await del(`trainers?ids=${ids}`);
-      return response;
+      const response = await axios.delete(`/api/trainers?ids=${ids}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -94,8 +103,8 @@ export const getSingleTrainers = createAsyncThunk(
   "getSingleTrainers",
   async (id: number) => {
     try {
-      const response = await get(`trainers/${id}`);
-      return response;
+      const response = await axios.get(`/api/trainers?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       // If an error occurs, return the error response data
       throw new Error(error.response.data);

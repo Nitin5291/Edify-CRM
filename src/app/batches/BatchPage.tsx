@@ -266,7 +266,8 @@ const BatchPage = ({
   const [active, setActive] = useState<string>("table");
   const [searchValue, setSearchValue] = useState<string>("");
   const [filterData, setFilterData] = useState<any>(BatcheListView?.[0]?.value);
-  const { batchData, isLoader, isdelLoader } = useAppSelector((state) => state?.batch);
+  let { batchData, isLoader, isdelLoader } = useAppSelector((state) => state?.batch);
+  batchData = batchData?.data
   const { nav } = useAppSelector((state) => state);
   const { CoursesData } = useAppSelector((state) => state?.courses);
 
@@ -340,7 +341,7 @@ const BatchPage = ({
 
   const handelOnContactModel = () => {
     dispatch(CreateLeadeStatus(!nav?.LeadStatus));
-    dispatch(getUser("salesperson"));
+    // dispatch(getUser("salesperson"));
   };
 
   const handelOnSave = () => {

@@ -1,5 +1,6 @@
 import { del, get, post, put, putFormData } from "@/base";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface LearnerState {
   loading: "idle" | "pending" | "fulfilled" | "rejected";
@@ -27,7 +28,7 @@ export const createLearner = createAsyncThunk(
   "createLearner",
   async (body: any) => {
     try {
-      const response = await post("learners", body);
+      const response = await axios.post("/api/learners", body);
       return response;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
@@ -47,10 +48,10 @@ export const createLearnerCourse = createAsyncThunk(
   }
 );
 
-export const getTrainer = createAsyncThunk("getTrainer", async (body: any) => {
+export const getTrainer = createAsyncThunk("getTrainer", async (id: any) => {
   try {
-    const response = await post("batches/trainer", body);
-    return response;
+    const response = await axios.get(`/api/learners/trainers?id=${id}`);
+    return response?.data;
   } catch (error: any) {
     throw new Error(JSON.stringify(error.response.data));
   }
@@ -74,8 +75,8 @@ export const createBatchTopic = createAsyncThunk(
 
 export const getLearner = createAsyncThunk("getLearner", async () => {
   try {
-    const response = await get(`learners`);
-    return response;
+    const response = await axios.get(`/api/learners`);
+    return response?.data;
   } catch (error: any) {
     throw new Error(error.response.data);
   }
@@ -85,8 +86,8 @@ export const getFilterLearner = createAsyncThunk(
   "getFilterLearner",
   async ({ data }: { data?: string }) => {
     try {
-      const response = await get(`learners?${data}`);
-      return response;
+      const response = await axios.get(`/api/learners?${data}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -97,7 +98,15 @@ export const updateLearner = createAsyncThunk(
   "updateLearner",
   async (data: any) => {
     try {
-      const response = await putFormData(`learners/${data?.id}`, data?.data);
+      const response = await axios.put(
+        `/api/learners?id=${data?.id}`,
+        data?.data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       return response;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
@@ -109,7 +118,7 @@ export const deleteLearnerData = createAsyncThunk(
   "/deleteLearnerData",
   async (ids: any) => {
     try {
-      const response = await del(`learners?ids=${ids}`);
+      const response = await axios.delete(`/api/learners?ids=${ids}`);
       return response;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
@@ -121,8 +130,8 @@ export const getSingleLearner = createAsyncThunk(
   "getSingleLearner",
   async (id: number) => {
     try {
-      const response = await get(`learners/${id}`);
-      return response;
+      const response = await axios.get(`/api/learners?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       // If an error occurs, return the error response data
       throw new Error(error.response.data);
@@ -133,8 +142,8 @@ export const getLearnerBatch = createAsyncThunk(
   "getLearnerBatch",
   async (id: number) => {
     try {
-      const response = await get(`learners/batch/${id}`);
-      return response;
+      const response = await axios.get(`/api/learners/batches?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       // If an error occurs, return the error response data
       throw new Error(error.response.data);

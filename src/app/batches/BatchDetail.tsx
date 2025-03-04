@@ -17,6 +17,7 @@ import { getLeadData } from "@/lib/features/lead/leadSlice";
 import MultiSelectDropdown from "../component/MultiSelectDropdown";
 import { getSingleBatch, updateBatch } from "@/lib/features/batch/batchSlice";
 import { getTrainer } from "@/lib/features/trainer/trainerSlice";
+import { getUserID } from "@/assets/utils/auth.util";
 
 const BatchDetail = ({
   handelOnSet,
@@ -30,7 +31,8 @@ const BatchDetail = ({
   const [changeContactData, setChangeContactData] = useState<CommonInterFace>(BatchForm);
   const [changeStatus, setChangeStatus] = useState<Boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { SingleBatch } = useAppSelector((state) => state?.batch);
+  let { SingleBatch } = useAppSelector((state) => state?.batch);
+  SingleBatch = SingleBatch?.data
   const { LeadData } = useAppSelector((state) => state?.lead);
   const handelOnStatus = (name: String, value: Boolean) => {
     setDisableData((prevData) => ({ ...prevData, [`${name}`]: value }));
@@ -148,7 +150,7 @@ const BatchDetail = ({
         topicStatus: batchData?.topicStatus ? batchData?.topicStatus : null,
         slot: batchData?.slot ? batchData?.slot : null,
         description: batchData?.description ? batchData?.description : null,
-
+        userId: getUserID(),
         // noOfStudents: batchData?.noOfStudents ? batchData?.noOfStudents : null,
         // note: batchData?.note,
       };

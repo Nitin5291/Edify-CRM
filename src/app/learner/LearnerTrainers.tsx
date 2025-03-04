@@ -84,14 +84,16 @@ const initialColumnDefs: ColDef[] = [
 
 const LearnerTrainers = () => {
     const dispatch = useAppDispatch();
-    let { learnerBatch, isLoader, trainerData } = useAppSelector((state) => state?.learner);
+    let { learnerBatch, isLoader, trainerData,SingleLearner } = useAppSelector((state) => state?.learner);
+      SingleLearner = SingleLearner?.learners
 
     useEffect(() => {
-        const idData = learnerBatch?.batches?.map((id: any) => id.id)?.join(',')
-        const learner = {
-            ids: idData
-        }
-        dispatch(getTrainer(learner))
+        // const idData = learnerBatch?.batches?.map((id: any) => id.id)?.join(',')
+        // const learner = {
+        //     ids: idData
+        // }
+        // dispatch(getTrainer(learner))
+        dispatch(getTrainer(SingleLearner?.id))
     }, [])
 
 
@@ -101,7 +103,7 @@ const LearnerTrainers = () => {
             noDataFoundMsg="Trainers data not found"
             isLoader={isLoader}
             initialColumnDefs={initialColumnDefs}
-            datas={trainerData?.data}
+            datas={trainerData?.trainers}
         // datas={[]}
         />
     )

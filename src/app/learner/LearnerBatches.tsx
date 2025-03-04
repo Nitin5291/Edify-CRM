@@ -16,20 +16,20 @@ const initialColumnDefs: ColDef[] = [
     maxWidth: 350,
   },
   {
-    field: "trainer",
+    field: "trainerName",
     headerName: "Trainer",
     minWidth: 190,
     maxWidth: 250,
-    cellRenderer: (params: { data: any }) => {
-      const data = params.data;
-      return (
-        <div className="flex items-center gap-2 capitalize ">
-          {data?.trainer?.name
-            ? data?.trainer?.name
-            : "-"}
-        </div>
-      );
-    },
+    // cellRenderer: (params: { data: any }) => {
+    //   const data = params.data;
+    //   return (
+    //     <div className="flex items-center gap-2 capitalize ">
+    //       {data?.trainer?.name
+    //         ? data?.trainer?.name
+    //         : "-"}
+    //     </div>
+    //   );
+    // },
   },
 
   {
@@ -235,7 +235,7 @@ const LearnerBatches = () => {
       noDataFoundMsg="Batches data not found"
       isLoader={isLoader}
       initialColumnDefs={initialColumnDefs}
-      datas={learnerBatch?.batches}
+      datas={learnerBatch?.batchDetails}
       // datas={[]}
     />
   )

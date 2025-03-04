@@ -1,147 +1,104 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { batches } from '@/drizzle/schema';
-import { desc, eq } from 'drizzle-orm';
+import { batches, learnersBatches , trainers } from '@/drizzle/schema';
+import { desc, eq, inArray } from 'drizzle-orm';
 
-// GET all batches// GET - Fetch a single batch if ID is provided, otherwise return all batches sorted by createdAt (descending)
-export async function GET(req: Request) {
-    try {
-      const { searchParams } = new URL(req.url);
-      const id = searchParams.get("id");
-  
-      if (id) {
-        // Fetch single batch by ID
-        const batch = await db.select().from(batches).where(eq(batches.id, Number(id))).limit(1);
-  
-        if (!batch.length) {
-          return NextResponse.json(
-            { success: false, message: "Batch not found" },
-            { status: 404 }
-          );
-        }
-  
-        return NextResponse.json({ success: true, data: batch[0] });
-      }
-  
-      // Fetch all batches sorted by createdAt (descending)
-      const allBatches = await db
-        .select()
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (id) {
+      // Fetch single batch by ID with all fields + trainerName
+      const batch = await db
+        .select({
+          id: batches.id,
+          batchName: batches.batchName,
+          location: batches.location,
+          slot: batches.slot,
+          trainerId: batches.trainerId,
+          batchStatus: batches.batchStatus,
+          topicStatus: batches.topicStatus,
+          noOfStudents: batches.noOfStudents,
+          stack: batches.stack,
+          startDate: batches.startDate,
+          tentativeEndDate: batches.tentativeEndDate,
+          classMode: batches.classMode,
+          stage: batches.stage,
+          comment: batches.comment,
+          timing: batches.timing,
+          batchStage: batches.batchStage,
+          mentor: batches.mentor,
+          zoomAccount: batches.zoomAccount,
+          stackOwner: batches.stackOwner,
+          owner: batches.owner,
+          batchOwner: batches.batchOwner,
+          description: batches.description,
+          userId: batches.userId,
+          createdAt: batches.createdAt,
+          updatedAt: batches.updatedAt,
+          trainerName: trainers.trainerName, // Add trainer's name
+        })
         .from(batches)
-        .orderBy(desc(batches.createdAt)); // Sorting by newest createdAt first
-  
-      return NextResponse.json({ success: true, data: allBatches });
-    } catch (error) {
-      console.error("Error fetching batches:", error);
-      return NextResponse.json(
-        { success: false, message: "Error fetching batches" },
-        { status: 500 }
-      );
-    }
-  }
-  
+        .leftJoin(trainers, eq(batches.trainerId, trainers.id))
+        .where(eq(batches.id, Number(id)))
+        .limit(1);
 
-// // POST a new batch
-// export async function POST(req: Request) {
-//     try {
-//       const body = await req.json();
-  
-//       // Extract all batch fields from request
-//       const {
-//         batchName,
-//         location,
-//         slot,
-//         trainerId,
-//         batchStatus = "Upcoming",
-//         topicStatus,
-//         noOfStudents,
-//         stack,
-//         startDate,
-//         tentativeEndDate,
-//         classMode,
-//         stage,
-//         comment,
-//         timing,
-//         batchStage,
-//         mentor,
-//         zoomAccount,
-//         stackOwner,
-//         owner,
-//         batchOwner,
-//         description,
-//         userId,
-//         learnerIds, // Array of learner IDs
-//       } = body;
-  
-//       // Ensure required fields are provided
-//       if (!batchName || !startDate || !tentativeEndDate || !batchStatus || !userId) {
-//         return NextResponse.json(
-//           { success: false, message: 'Missing required fields' },
-//           { status: 400 }
-//         );
-//       }
-  
-//       // Insert new batch into the database with all schema fields
-//       const newBatch = await db.insert(batches).values({
-//         batchName,
-//         location,
-//         slot,
-//         trainerId,
-//         batchStatus,
-//         topicStatus,
-//         noOfStudents,
-//         stack,
-//         startDate,
-//         tentativeEndDate,
-//         classMode,
-//         stage,
-//         comment,
-//         timing,
-//         batchStage,
-//         mentor,
-//         zoomAccount,
-//         stackOwner,
-//         owner,
-//         batchOwner,
-//         description,
-//         userId,
-//       }).returning();
-  
-//       const batchId = newBatch[0]?.id;
-//       if (!batchId) {
-//         return NextResponse.json({ success: false, message: 'Failed to create batch' }, { status: 500 });
-//       }
-  
-//       Associate learners with the batch (if provided)
-//       if (learnerIds && Array.isArray(learnerIds) && learnerIds.length > 0) {
-//         // Validate learner IDs before association
-//         const validLearners = await db
-//           .select()
-//           .from(learners)
-//           .where(inArray(learners.id, learnerIds));
-  
-//         if (validLearners.length > 0) {
-//           const batchAssociations = validLearners.map((learner) => ({ 
-//             learnerId: learner.id,
-//             batchId,
-//           }));
-  
-//           await db.insert(learnerBatch).values(batchAssociations);
-//         }
-//       }
-  
-//       return NextResponse.json({
-//         success: true,
-//         message: 'Batch created successfully',
-//         data: newBatch,
-//       });
-//     } catch (error) {
-//       console.error('Error creating batch:', error);
-//       return NextResponse.json(
-//         { success: false, message: 'Error creating batch', error },
-//         { status: 500 }
-//       );
-//     }
-//   }
+      if (!batch.length) {
+        return NextResponse.json(
+          { success: false, message: "Batch not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ success: true, data: batch[0] });
+    }
+
+    // Fetch all batches with all fields + trainerName
+    const allBatches = await db
+      .select({
+        id: batches.id,
+        batchName: batches.batchName,
+        location: batches.location,
+        slot: batches.slot,
+        trainerId: batches.trainerId,
+        batchStatus: batches.batchStatus,
+        topicStatus: batches.topicStatus,
+        noOfStudents: batches.noOfStudents,
+        stack: batches.stack,
+        startDate: batches.startDate,
+        tentativeEndDate: batches.tentativeEndDate,
+        classMode: batches.classMode,
+        stage: batches.stage,
+        comment: batches.comment,
+        timing: batches.timing,
+        batchStage: batches.batchStage,
+        mentor: batches.mentor,
+        zoomAccount: batches.zoomAccount,
+        stackOwner: batches.stackOwner,
+        owner: batches.owner,
+        batchOwner: batches.batchOwner,
+        description: batches.description,
+        userId: batches.userId,
+        createdAt: batches.createdAt,
+        updatedAt: batches.updatedAt,
+        trainerName: trainers.trainerName, // Add trainer's name
+      })
+      .from(batches)
+      .leftJoin(trainers, eq(batches.trainerId, trainers.id))
+      .orderBy(desc(batches.createdAt));
+
+    return NextResponse.json({ success: true, data: allBatches });
+  } catch (error) {
+    console.error("Error fetching batches:", error);
+    return NextResponse.json(
+      { success: false, message: "Error fetching batches" },
+      { status: 500 }
+    );
+  }
+}
+
+
 
 // POST a new batch
 export async function POST(req: Request) {
@@ -175,7 +132,7 @@ export async function POST(req: Request) {
       } = body;
   
       // Ensure required fields are provided
-      if (!batchName || !startDate || !tentativeEndDate || !batchStatus || !userId) {
+      if (!batchName || !userId) {
         return NextResponse.json(
           { success: false, message: 'Missing required fields' },
           { status: 400 }
@@ -244,7 +201,6 @@ export async function POST(req: Request) {
 
 
 // PUT - Update a batch
-// PUT - Update an existing batch
 export async function PUT(req: Request) {
     try {
 
@@ -321,25 +277,58 @@ export async function PUT(req: Request) {
   }
   
 
-// DELETE - Remove a batch
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const idString = searchParams.get("ids"); // Expecting "1,2,3"
 
-    if (!id) {
-      return NextResponse.json({ success: false, message: 'Batch ID is required' }, { status: 400 });
+    if (!idString) {
+      return NextResponse.json(
+        { message: "Batch IDs are required" },
+        { status: 400 }
+      );
     }
 
-    const deletedBatch = await db.delete(batches).where(eq(batches.id, Number(id))).returning();
+    // Convert comma-separated string into an array of numbers
+    const ids = idString.split(",").map((id) => Number(id.trim()));
 
-    if (!deletedBatch.length) {
-      return NextResponse.json({ success: false, message: 'Batch not found' }, { status: 404 });
+    if (ids.some(isNaN)) {
+      return NextResponse.json(
+        { message: "Invalid Batch IDs format" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ success: true, message: 'Batch deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting batch:', error);
-    return NextResponse.json({ success: false, message: 'Error deleting batch' }, { status: 500 });
+    // Check if batches exist before deleting
+    const existingBatches = await db
+      .select()
+      .from(batches)
+      .where(inArray(batches.id, ids));
+
+    if (existingBatches.length === 0) {
+      return NextResponse.json(
+        { message: "No batches found for the given IDs" },
+        { status: 404 }
+      );
+    }
+
+    // First, delete related records in learnersBatches table
+    await db
+      .delete(learnersBatches)
+      .where(inArray(learnersBatches.batchId, ids));
+
+    // Now, delete batches from the database
+    await db.delete(batches).where(inArray(batches.id, ids));
+
+    return NextResponse.json({
+      message: "Batches and related learner-batch entries deleted successfully",
+      deletedBatchIds: ids,
+    });
+  } catch (error: any) {
+    console.error("Error deleting batches:", error);
+    return NextResponse.json(
+      { message: "Internal server error", error: error.message },
+      { status: 500 }
+    );
   }
 }

@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/store";
 import MultiSelectDropdown from "../component/MultiSelectDropdown";
 import { getUser } from "@/lib/features/auth/authSlice";
 import { updateTrainer } from "@/lib/features/trainer/trainerSlice";
+import { getUserID } from "@/assets/utils/auth.util";
 
 const TrainerDetail = ({
   handelOnSet,
@@ -29,15 +30,16 @@ const TrainerDetail = ({
   const [changeContactData, setChangeContactData] = useState<CommonInterFace>(TrainerForm);
   const [changeStatus, setChangeStatus] = useState<Boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { singleTrainerData } = useAppSelector((state) => state?.trainer);
+  let { singleTrainerData } = useAppSelector((state) => state?.trainer);
+  singleTrainerData = singleTrainerData?.data
   const handelOnStatus = (name: String, value: Boolean) => {
     setDisableData((prevData) => ({ ...prevData, [`${name}`]: value }));
   };
   const { allUser } = useAppSelector((state) => state?.auth);
 
   const TrainerData: HostItem[] = allUser?.users?.map((item: any) => {
-    return { lable: item?.name, value: item?.id };
-  });
+    return { lable: item?.user_metadata?.name, value: item?.id };
+  })
   // useEffect(() => {
   //   dispatch(getUser("trainer"));
   // }, []);
@@ -215,11 +217,14 @@ const TrainerDetail = ({
       formData.append("working", trainerData.working ? trainerData.working : null);
       formData.append("commercialNote", trainerData.commercialNote ? trainerData.commercialNote : null);
       formData.append("trainerNote", trainerData.trainerNote ? trainerData.trainerNote : null);
+      formData.append("countryCode", trainerData.countryCode ? trainerData.countryCode : "91");
+      formData.append("userId", getUserID());
 
 
       dispatch(updateTrainer({ id: singleTrainerData?.id, data: formData }))
         .unwrap()
         .then((res: any) => {
+          debugger
           if (res) {
             toast.success(
               res?.message ? res?.message : "Trainer Update Successfully"
@@ -254,9 +259,11 @@ const TrainerDetail = ({
                     lable={item?.lableValue}
                     disable={disableData?.[item?.name]}
                     name={item?.name}
-                    error={error?.[item?.name]}
+                    name1={item?.name1}
+                    error={error?.[item?.name] || error[item?.name1]}
                     type={item?.typeValue}
                     value={item?.name === "idProof" ? trainerData[item?.name]?.name ? trainerData[item?.name]?.name : trainerData[item?.name] : trainerData?.[item?.name]}
+                    value1={trainerData[item?.name1]}
                     onChange={handelOnChange}
                     handelOnStatus={handelOnStatus}
 

@@ -9,14 +9,14 @@ export async function uploadFile(
 
     const filePath = `${folder}/${Date.now()}_${file.name}`;
     const { data, error } = await supabase.storage
-      .from("uploads")
+      .from("LMS")
       .upload(filePath, file);
 
     if (error) throw error;
 
     // Get the public URL of the uploaded file
     const { data: urlData } = supabase.storage
-      .from("uploads")
+      .from("LMS")
       .getPublicUrl(filePath);
 
     return urlData.publicUrl || null;
@@ -44,3 +44,26 @@ export async function manyUpload(
     return [];
   }
 }
+
+export async function deleteFile(fileUrl: string): Promise<boolean> {
+  try {
+    if (!fileUrl) throw new Error("No file URL provided");
+
+    // Extract file path after "LMS/" (LMS is your bucket name)
+    const filePath = fileUrl.split("/LMS/")[1];
+
+    if (!filePath) throw new Error("Invalid file URL format");
+
+    // Delete the file using the extracted path
+    const { error } = await supabase.storage.from("LMS").remove([filePath]);
+
+    if (error) throw error;
+
+    console.log("✅ File deleted successfully:", fileUrl);
+    return true;
+  } catch (error) {
+    console.error("❌ File deletion error:", error);
+    return false;
+  }
+}
+

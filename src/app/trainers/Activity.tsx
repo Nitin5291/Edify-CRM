@@ -20,8 +20,8 @@ import Slack from "../batches/Slack";
 
 const Activity = () => {
   const [activityStatus, setActivityStatus] = useState<String>("new_task");
-  const { singleTrainerData } = useAppSelector((state) => state?.trainer);
-
+  let { singleTrainerData } = useAppSelector((state) => state?.trainer);
+  singleTrainerData = singleTrainerData?.data
   const handelOnStatusChange = (name: String) => {
     setActivityStatus(name);
   };
@@ -121,7 +121,7 @@ const Activity = () => {
       </div>
 
       {activityStatus === "activity" ? (
-        <ActivityAccordion />
+        <ActivityAccordion name="trainerId" id={singleTrainerData?.id}/>
       ) : activityStatus === "new_task" ? (
         <NewTask name="trainerId" id={singleTrainerData?.id} />
       ) : activityStatus === "new_meeting" ? (

@@ -35,13 +35,15 @@ const LearnerDetail = ({
   );
   const [learnerData, setLearnerData] =
     useState<OpportunitiyData1>(LearnerDataView);
+  console.log("🚀 ~ learnerData:", learnerData)
   const [error, setError] = useState<OpportunitiyData1>(LearnerDataView);
   const [changeContactData, setChangeContactData] =
     useState<OpportunitiyData1>(LearnerDataView);
   const [changeStatus, setChangeStatus] = useState<Boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   let { SingleLearner } = useAppSelector((state) => state?.learner);
-  SingleLearner = SingleLearner?.response
+  SingleLearner = SingleLearner?.learners
+  console.log("🚀 ~ SingleLearner:", SingleLearner)
   const handelOnStatus = (name: String, value: Boolean) => {
     setDisableData({ ...LearnerDisableDataView, [`${name}`]: value });
   };
@@ -51,11 +53,16 @@ const LearnerDetail = ({
     return { lable: item?.name, value: item?.id };
   });
 
-  const { batchData } = useAppSelector((state) => state?.batch);
+  let { batchData } = useAppSelector((state) => state?.batch);
+  batchData = batchData?.data
+  console.log("🚀 ~ batchData:", batchData)
   const Batch: HostItem[] = batchData?.map((item: any) => {
     return { lable: item?.batchName, value: item?.id };
   });
-  console.log("🚀 ~ constBatch:HostItem[]=batchData?.map ~ Batch:", Batch)
+  console.log("🚀 ~ constBatch:HostItem[]=batchData?.map ~ Batch:", Batch, SingleLearner?.batchId?.split(","), SingleLearner?.batchId?.split(",")?.map((item: any) => {
+    const data = Batch?.filter((i) => i?.value == item)
+    return data?.[0];
+  }))
 
   useEffect(() => {
     dispatch(getCourses());
@@ -104,9 +111,10 @@ const LearnerDetail = ({
 
   const handelonClear = () => {
     const filterData = {
-      ...SingleLearner /* , instalment1Screenshot: SingleLearner?.instalment1Screenshot?.[0], idProof: SingleLearner?.idProof?.[0], */, batchId: SingleLearner?.batches?.map((item: any) => {
-        return { lable: item?.batchName, value: item?.id };
-      })
+      ...SingleLearner /* , instalment1Screenshot: SingleLearner?.instalment1Screenshot?.[0], idProof: SingleLearner?.idProof?.[0], */, batchId: SingleLearner?.batchId?.split(",")?.length > 0 ? SingleLearner?.batchId?.split(",")?.map((item: any) => {
+        const data = Batch?.filter((i) => i?.value == item)
+        return data?.[0];
+      }) : []
     }
     console.log("🚀 ~ handelonClear ~ filterData:", filterData)
     setLearnerData(filterData);
@@ -217,7 +225,7 @@ const LearnerDetail = ({
       formData.append("batchId", learnerData?.batchId?.[0]?.value
         ? learnerData?.batchId?.map((item: any) => {
           return item?.value;
-        })
+        })?.join()
         : learnerData?.batchId ? learnerData?.batchId : null);
       formData.append("phone", learnerData?.phone ? learnerData?.phone : '');
       formData.append("dateOfBirth", learnerData?.dateOfBirth ? learnerData?.dateOfBirth : null);
@@ -236,6 +244,7 @@ const LearnerDetail = ({
       }
       formData.append("dueAmount", learnerData?.dueAmount ? learnerData?.dueAmount : '');
       formData.append("dueDate", learnerData?.dueDate ? learnerData?.dueDate : null);
+      formData.append("countryCode ", learnerData?.countryCode ? learnerData?.countryCode : '91');
 
       dispatch(updateLearner({ id: SingleLearner?.id, data: formData }))
         .unwrap()
@@ -269,9 +278,11 @@ const LearnerDetail = ({
                   lable={item?.lableValue}
                   disable={disableData?.[item?.name]}
                   name={item?.name}
-                  error={error?.[item?.name]}
+                  name1={item?.name1}
+                  error={error?.[item?.name] || error?.[item?.name1]}
                   type={item?.typeValue}
                   value={item?.name === "idProof" ? learnerData?.[item?.name]?.name ? learnerData?.[item?.name]?.name : learnerData?.[item?.name] : learnerData?.[item?.name]}
+                  value1={learnerData?.[item?.name1]}
                   onChange={handelOnChange}
                   handelOnStatus={handelOnStatus}
                 />

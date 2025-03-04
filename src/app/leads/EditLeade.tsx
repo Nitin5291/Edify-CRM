@@ -197,7 +197,7 @@ const EditContact = ({
                 <IoPerson size={20} />
               )} */}
               <span className="text-green-500 text-sm font-semibold ">
-                {kanbanAllData?.data?.filter((item?: { id: number }) => item?.id == SingleLead?.leadStatus)?.[0]?.kanbanHeaders}
+              {SingleLead?.leadStatus}
               </span>
             </div>
           </div>

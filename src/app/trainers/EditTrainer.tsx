@@ -23,8 +23,8 @@ const EditTrainer = ({
 }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<String>("Details");
-  const { singleTrainerData } = useAppSelector((state) => state?.trainer);
-
+  let { singleTrainerData } = useAppSelector((state) => state?.trainer);
+  singleTrainerData = singleTrainerData?.data
   useMemo(() => {
     if (trainer?.[0]?.id) {
       dispatch(getSingleTrainers(trainer?.[0]?.id));

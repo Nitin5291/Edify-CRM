@@ -17,6 +17,7 @@ import { MdDelete, MdModeEdit } from "react-icons/md";
 import { getUser } from "@/lib/features/auth/authSlice";
 import useDebounce from "@/CommonData";
 import { postpy } from "@/base";
+import { getUserID } from "@/assets/utils/auth.util";
 
 const Note = ({ name, id }: { name?: string; id?: number }) => {
   const [noteData, setNoteData] = useState<string>("");
@@ -164,21 +165,27 @@ const Note = ({ name, id }: { name?: string; id?: number }) => {
     const data = name === "batchId" ? {
       content: noteData,
       batchId: id,
+      userId: getUserID()
     } : name === "trainerId" ? {
       content: noteData,
       trainerId: id,
+      userId: getUserID()
     } : name === "campaignId" ? {
       content: noteData,
       campaignId: id,
+      userId: getUserID()
     } : name === "mainTaskId" ? {
       content: noteData,
       mainTaskId: id,
+      userId: getUserID()
     } : name === "learnerId" ? {
       content: noteData,
       learnerId: id,
-    } : {
+      userId: getUserID()
+    } : name&& {
       content: noteData,
-      leadId: SingleLead?.id,
+      [name]: id || SingleLead?.id,
+      userId: getUserID()
     };
     dispatch(addNote(data))
       .unwrap()
@@ -209,15 +216,19 @@ const Note = ({ name, id }: { name?: string; id?: number }) => {
     const data = name === "batchId" ? {
       content: noteData,
       batchId: id,
+      userId: getUserID()
     } : name === "trainerId" ? {
       content: noteData,
       trainerId: id,
+      userId: getUserID()
     } : name === "campaignId" ? {
       content: noteData,
       campaignId: id,
-    } : {
+      userId: getUserID()
+    } : name &&  {
       content: noteData,
-      leadId: SingleLead?.id,
+      [name]: id|| SingleLead?.id,
+      userId: getUserID()
     };
     dispatch(updateNote({ id: edit, data: data }))
       .unwrap()

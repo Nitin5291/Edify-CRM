@@ -32,8 +32,8 @@ const initialColumnDefs: ColDef[] = [
       const data = params.data;
       return (
         <div className="flex items-center gap-2 capitalize ">
-          {data?.trainer?.name
-            ? data?.trainer?.name
+          {data?.trainerName
+            ? data?.trainerName
             : "-"}
         </div>
       );
@@ -239,15 +239,12 @@ const BatchesPage = () => {
   const dispatch = useAppDispatch();
   const tableRef = useRef<any>(null);
   const [pagination, setPagination] = useState<number>(0);
-  const { singleTrainerData, batchesTrainerData, isLoader } = useAppSelector((state) => state?.trainer);
-  const { CoursesData } = useAppSelector((state) => state?.courses);
+  let { singleTrainerData, batchesTrainerData, isLoader } = useAppSelector((state) => state?.trainer);
+  singleTrainerData = singleTrainerData?.data
 
   useEffect(() => {
     if (singleTrainerData?.id) {
       dispatch(getBatchesTrainer(singleTrainerData?.id));
-    }
-    if (!(CoursesData?.courses?.length > 0)) {
-      dispatch(getCourses());
     }
   }, []);
 
@@ -323,7 +320,7 @@ const BatchesPage = () => {
             >
               <AgGridReact
                 ref={tableRef}
-                rowData={batchesTrainerData}
+                rowData={batchesTrainerData?.map((item: any) => { return { ...item, trainerName: singleTrainerData?.trainerName } })}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 enableBrowserTooltips={true}

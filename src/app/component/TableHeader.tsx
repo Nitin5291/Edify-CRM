@@ -135,27 +135,29 @@ const TableHeader = ({
   };
 
   const countLeadsByStatus = (status: string) => {
-    if (status === "all") {
-      return tableData?.length;
-    } else {
-      return tableData?.filter(
-        (lead: {
-          leadStatus: string;
-          opportunityStatus: string;
-          batchStatus: string;
-          trainerStatus: string;
-          status: string;
-        }) =>
-          (pathname === "/trainers"
-            ? lead?.trainerStatus
-            : pathname === "/batches"
-              ? lead?.batchStatus
-              : pathname === "/opportunities"
-                ? lead?.opportunityStatus
-                : pathname === "/campaign" || pathname === "/learner" || pathname === "/tasks"
-                  ? lead?.status
-                  : lead?.leadStatus) === status.toString()
-      ).length;
+    if (Array.isArray(tableData)) {
+      if (status === "all") {
+        return tableData?.length;
+      } else {
+        return tableData?.filter(
+          (lead: {
+            leadStatus: string;
+            opportunityStatus: string;
+            batchStatus: string;
+            trainerStatus: string;
+            status: string;
+          }) =>
+            (pathname === "/trainers"
+              ? lead?.trainerStatus
+              : pathname === "/batches"
+                ? lead?.batchStatus
+                : pathname === "/opportunities"
+                  ? lead?.opportunityStatus
+                  : pathname === "/campaign" || pathname === "/learner" || pathname === "/tasks"
+                    ? lead?.status
+                    : lead?.leadStatus) === status.toString()
+        ).length;
+      }
     }
   };
 

@@ -18,9 +18,9 @@ export const navigation = [
       { name: "Demo Attended" },
     ],
   },
-  // { name: "Learners", href: "/learner", current: false },
-  // { name: "Batches", href: "/batches", current: false },
-  // { name: "Trainers", href: "/trainers", current: false },
+  { name: "Learners", href: "/learner", current: false },
+  { name: "Batches", href: "/batches", current: false },
+  { name: "Trainers", href: "/trainers", current: false },
   // // { name: "Courses", href: "/courses", current: false },
   // // { name: "Ask AI", href: "/ask_aI", current: true },
   // // { name: "Activities", href: "#", current: false },
@@ -759,7 +759,7 @@ export const createLeadForm: any = [
     typeValue: "text",
     type: "input",
     name1: "countryCode",
-    mandatory: true
+    mandatory: true,
   },
   {
     name: "techStack",
@@ -819,7 +819,7 @@ export const createLeadForm1: any = [
     placeholder: "Contact Number",
     typeValue: "text",
     type: "input",
-    mandatory: true
+    mandatory: true,
   },
   {
     name: "expectedWalkInDate",
@@ -1844,6 +1844,7 @@ export const createTrainerForm: any = [
     placeholder: "Phone",
     typeValue: "text",
     type: "input",
+    name1: "countryCode",
   },
   {
     name: "location",
@@ -1875,6 +1876,7 @@ export const updateTrainerForm: any = [
     placeholder: "Phone",
     typeValue: "text",
     type: "input",
+    name1: "countryCode",
   },
   {
     name: "idProof",
@@ -2174,7 +2176,8 @@ export const createLearnerFormData: any = [
     placeholder: "Phone",
     typeValue: "text",
     type: "input",
-    mandatory: true
+    mandatory: true,
+    name1: "countryCode",
   },
   {
     name: "registeredDate",
@@ -2220,6 +2223,7 @@ export const createLearnerForm: any = [
     placeholder: "Phone",
     typeValue: "text",
     type: "input",
+    name1: "countryCode",
   },
   {
     name: "dateOfBirth",
@@ -2398,6 +2402,7 @@ export const createLearnerTrainerForm: any = [
     placeholder: "Phone",
     typeValue: "text",
     type: "input",
+    name1: "countryCode",
   },
   {
     name: "dateofBirth",
@@ -2439,6 +2444,7 @@ export const createLearnerTrainerForm: any = [
     placeholder: "Alternate phone",
     typeValue: "text",
     type: "input",
+    name1: "countryCode",
   },
   {
     name: "description",

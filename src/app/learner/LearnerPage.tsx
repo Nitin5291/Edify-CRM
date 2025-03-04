@@ -230,7 +230,8 @@ const LearnerPage = ({
     LearnersListView?.[0]?.value
   );
   const { nav } = useAppSelector((state) => state);
-  const { learnerData, isLoader, isdelLoader } = useAppSelector((state) => state?.learner);
+  let { learnerData, isLoader, isdelLoader } = useAppSelector((state) => state?.learner);
+  learnerData = learnerData?.learners
 
   useEffect(() => {
 
@@ -292,7 +293,7 @@ const LearnerPage = ({
 
   const handelOnContactModel = () => {
     dispatch(CreateLeadeStatus(!nav?.LeadStatus));
-    dispatch(getUser("salesperson"));
+    // dispatch(getUser("salesperson"));
   };
 
   const handelOnSave = () => {

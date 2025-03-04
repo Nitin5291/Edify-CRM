@@ -20,8 +20,8 @@ import { useAppSelector } from "@/lib/store";
 
 const Activity = () => {
   const [activityStatus, setActivityStatus] = useState<String>("new_task");
-  const { SingleBatch } = useAppSelector((state) => state?.batch);
-
+  let { SingleBatch } = useAppSelector((state) => state?.batch);
+  SingleBatch = SingleBatch?.data
   const handelOnStatusChange = (name: String) => {
     setActivityStatus(name);
   };
@@ -121,7 +121,7 @@ const Activity = () => {
       </div>
 
       {activityStatus === "activity" ? (
-        <ActivityAccordion />
+        <ActivityAccordion name="batchId" id={SingleBatch?.id} />
       ) : activityStatus === "new_task" ? (
         <NewTask name="batchId" id={SingleBatch?.id} />
       ) : activityStatus === "new_meeting" ? (
@@ -133,7 +133,7 @@ const Activity = () => {
       ) : activityStatus === "whatsApp" ? (
         <WhatsApp name="batchId" id={SingleBatch?.id} />
       ) : activityStatus === "message" ? (
-        <Message  name="batchId" id={SingleBatch?.id}/>
+        <Message name="batchId" id={SingleBatch?.id} />
       ) : activityStatus === "Slack" ? (
         <Slack />
       ) : null}

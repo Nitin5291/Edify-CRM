@@ -27,12 +27,12 @@ const EditLearner = ({
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<String>("Details");
   let { SingleLearner } = useAppSelector((state) => state?.learner);
-  SingleLearner = SingleLearner?.learner
+  SingleLearner = SingleLearner?.learners
   useMemo(() => {
     if (learner?.[0]?.id) {
       dispatch(getSingleLearner(learner?.[0]?.id));
       dispatch(getLearnerBatch(learner?.[0]?.id));
-      dispatch(getUser("salesperson"));
+      // dispatch(getUser("salesperson"));
     }
   }, [learner?.[0]?.id]);
 

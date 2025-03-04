@@ -1,5 +1,6 @@
 import { del, get, post, put } from "@/base";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface BatchState {
   loading: "idle" | "pending" | "fulfilled" | "rejected";
@@ -27,7 +28,7 @@ export const createBatch = createAsyncThunk(
   "createbatch",
   async (body: any) => {
     try {
-      const response = await post("batches", body);
+      const response = await axios.post("/api/batches", body);
       return response;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
@@ -52,8 +53,8 @@ export const createBatchTopic = createAsyncThunk(
 
 export const getBatch = createAsyncThunk("getbatch", async () => {
   try {
-    const response = await get(`batches`);
-    return response;
+    const response = await axios.get(`/api/batches`);
+    return response?.data;
   } catch (error: any) {
     throw new Error(error.response.data);
   }
@@ -63,8 +64,8 @@ export const getBatchByLearner = createAsyncThunk(
   "getBatchByLearner",
   async (id: number) => {
     try {
-      const response = await get(`batches/learner/${id}`);
-      return response;
+      const response = await axios.get(`/api/batches/learners?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -75,8 +76,8 @@ export const getFilterBatch = createAsyncThunk(
   "getFilterbatch",
   async ({ data }: { data?: string }) => {
     try {
-      const response = await get(`batches?${data}`);
-      return response;
+      const response = await axios.get(`/api/batches?${data}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -87,8 +88,11 @@ export const updateBatch = createAsyncThunk(
   "updateBatch",
   async (data: any) => {
     try {
-      const response = await put(`batches/${data?.id}`, data?.data);
-      return response;
+      const response = await axios.put(
+        `/api/batches?id=${data?.id}`,
+        data?.data
+      );
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -99,8 +103,8 @@ export const deleteBatchData = createAsyncThunk(
   "/deleteBatchData",
   async (ids: any) => {
     try {
-      const response = await del(`batches?ids=${ids}`);
-      return response;
+      const response = await axios.delete(`/api/batches?ids=${ids}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -111,8 +115,8 @@ export const getSingleBatch = createAsyncThunk(
   "getSingleBatch",
   async (id: number) => {
     try {
-      const response = await get(`batches/${id}`);
-      return response;
+      const response = await axios.get(`/api/batches?id=${id}`);
+      return response?.data;
     } catch (error: any) {
       // If an error occurs, return the error response data
       throw new Error(error.response.data);

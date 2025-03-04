@@ -12,8 +12,8 @@ const BatchKanban = () => {
   const pathName = usePathname();
 
   useEffect(() => {
-    setTasks(batchData);
-  }, [batchData]);
+    setTasks(batchData?.data);
+  }, [batchData?.data]);
 
   const onDragStart = (evt: {
     currentTarget: {

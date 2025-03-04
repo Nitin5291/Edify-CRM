@@ -3,7 +3,6 @@ import KanbanCard from "../component/KanbanCard";
 import { useAppDispatch, useAppSelector } from "@/lib/store";
 import { toast } from "react-toastify";
 import { usePathname } from "next/navigation";
-import { getBatch, updateBatch } from "@/lib/features/batch/batchSlice";
 import { getLearner, updateLearner } from "@/lib/features/learner/learnerSlice";
 
 const LearnerKanban = () => {
@@ -13,8 +12,8 @@ const LearnerKanban = () => {
   const pathName = usePathname();
 
   useEffect(() => {
-    setTasks(learnerData);
-  }, [learnerData]);
+    setTasks(learnerData?.learners);
+  }, [learnerData?.learners]);
 
   const onDragStart = (evt: {
     currentTarget: {

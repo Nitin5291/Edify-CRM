@@ -247,7 +247,7 @@ const TaskPage = ({
 
   const handelOnContactModel = () => {
     dispatch(CreateLeadeStatus(!nav?.LeadStatus));
-    dispatch(getUser("salesperson"));
+    // dispatch(getUser("salesperson"));
   };
 
   const handelOnSave = () => {

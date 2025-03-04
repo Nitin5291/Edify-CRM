@@ -21,7 +21,7 @@ import Slack from "../batches/Slack";
 const Activity = () => {
   const [activityStatus, setActivityStatus] = useState<String>("new_task");
   let { SingleLearner } = useAppSelector((state) => state?.learner);
-  SingleLearner = SingleLearner?.learner
+  SingleLearner = SingleLearner?.learners
 
   console.log("🚀 ~ Activity ~ SingleLearner:", SingleLearner)
 
@@ -123,7 +123,7 @@ const Activity = () => {
       </div>
 
       {activityStatus === "activity" ? (
-        <ActivityAccordion />
+        <ActivityAccordion name="learnerId" id={SingleLearner?.id} />
       ) : activityStatus === "new_task" ? (
         <NewTask name="learnerId" id={SingleLearner?.id} />
       ) : activityStatus === "new_meeting" ? (
@@ -135,7 +135,7 @@ const Activity = () => {
       ) : activityStatus === "whatsApp" ? (
         <WhatsApp name="learnerId" id={SingleLearner?.id} />
       ) : activityStatus === "message" ? (
-        <Message  name="learnerId" id={SingleLearner?.id}/>
+        <Message name="learnerId" id={SingleLearner?.id} />
       ) : activityStatus === "Slack" ? (
         <Slack />
       ) : null}

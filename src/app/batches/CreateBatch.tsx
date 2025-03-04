@@ -14,6 +14,7 @@ import { ImBin } from "react-icons/im";
 import { createBatch, createBatchTopic } from "@/lib/features/batch/batchSlice";
 import { getLeadData } from "@/lib/features/lead/leadSlice";
 import { getTrainer } from "@/lib/features/trainer/trainerSlice";
+import { getUserID } from "@/assets/utils/auth.util";
 
 
 const CreateBatch = ({
@@ -97,6 +98,7 @@ const CreateBatch = ({
         trainerId: batch?.trainerId,
         tentativeEndDate: batch?.tentativeEndDate ? batch?.tentativeEndDate : null,
         description: batch?.description ? batch?.description : null,
+        userId: getUserID()
         // batchStatus: batch?.batchStatus ? batch?.batchStatus : null,
         // classMode: batch?.classMode,
         // topicStatus: batch?.topicStatus ? batch?.topicStatus : null,
@@ -107,31 +109,36 @@ const CreateBatch = ({
       dispatch(createBatch(data))
         .unwrap()
         .then((res: any) => {
-          if (res?.status === 201) {
+          debugger
+          if (res?.status === 200) {
             toast.success(
               res?.data?.message
                 ? res?.data?.message
                 : "Batch Created Successfully"
             );
-            dispatch(createBatchTopic({ id: res?.data?.data?.id, data: [...batch?.first_month, ...batch?.second_month, ...batch?.third_month] })).unwrap().then((res1: any) => {
-              if (res1?.status === 200) {
-                toast.success(
-                  res1?.data?.message
-                    ? res1?.data?.message
-                    : "Batch topics processed successfully"
-                );
                 setBatch({});
                 setError({});
                 handelOnSave();
                 handelOnStaticData();
-              }
-            }).catch((err1) => {
-              const error = JSON.parse(err1.message);
-              toast.error(error?.error ? error?.error : "Something went wrong");
-            })
-              .finally(() => {
-                setIsLoading(false);
-              });
+            // dispatch(createBatchTopic({ id: res?.data?.data?.id, data: [...batch?.first_month, ...batch?.second_month, ...batch?.third_month] })).unwrap().then((res1: any) => {
+            //   if (res1?.status === 200) {
+            //     toast.success(
+            //       res1?.data?.message
+            //         ? res1?.data?.message
+            //         : "Batch topics processed successfully"
+            //     );
+            //     setBatch({});
+            //     setError({});
+            //     handelOnSave();
+            //     handelOnStaticData();
+            //   }
+            // }).catch((err1) => {
+            //   const error = JSON.parse(err1.message);
+            //   toast.error(error?.error ? error?.error : "Something went wrong");
+            // })
+            //   .finally(() => {
+            //     setIsLoading(false);
+            //   });
           }
         })
         .catch((err) => {
