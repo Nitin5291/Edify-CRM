@@ -349,3 +349,23 @@ export const batch_lead = pgTable("batch_lead", {
   batchId: integer("batch_id").notNull(),
   leadId: integer("lead_id").notNull(),
 });
+
+export const mainTasks = pgTable("main_tasks", {
+  id: serial("id").primaryKey(),
+  taskOwner: integer("task_owner"),
+  assignTo: integer("assign_to"),
+  dueDate: timestamp("due_date"),
+  subject: varchar("subject", { length: 255 }),
+  source: varchar("source", { length: 255 }),
+  note: text("note"),
+  learnerId: integer("learner_id"),
+  batch: varchar("batch", { length: 255 }),
+  priority: varchar("priority", { length: 255 }),
+  status: varchar("status", { length: 255 }),
+  reminder: boolean("reminder"),
+  taskType: varchar("task_type", { length: 255 }),
+  description: text("description"),
+  userId: text("user_id"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});

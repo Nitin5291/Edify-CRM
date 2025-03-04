@@ -109,7 +109,6 @@ const CreateBatch = ({
       dispatch(createBatch(data))
         .unwrap()
         .then((res: any) => {
-          debugger
           if (res?.status === 200) {
             toast.success(
               res?.data?.message

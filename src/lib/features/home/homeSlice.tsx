@@ -1,5 +1,6 @@
 import { del, get, post } from '@/base';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 interface AuthState {
     homeData: any;
@@ -19,8 +20,8 @@ const initialState: AuthState = {
 export const getHome = createAsyncThunk(
     "/getHome", async () => {
         try {
-            const response = await get(`leads/statistics`);
-            return response;
+            const response = await axios.get(`/api/leads/statistics`);
+            return response?.data;
         } catch (error: any) {
             throw new Error(JSON.stringify(error.response.data));
         }

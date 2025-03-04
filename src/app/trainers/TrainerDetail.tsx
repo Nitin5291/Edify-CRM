@@ -224,7 +224,6 @@ const TrainerDetail = ({
       dispatch(updateTrainer({ id: singleTrainerData?.id, data: formData }))
         .unwrap()
         .then((res: any) => {
-          debugger
           if (res) {
             toast.success(
               res?.message ? res?.message : "Trainer Update Successfully"

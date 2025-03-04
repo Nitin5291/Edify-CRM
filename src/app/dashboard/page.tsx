@@ -21,6 +21,7 @@ const page = () => {
   }, []);
 
   const { homeData, isLoader } = useAppSelector((state) => state?.home);
+  console.log("🚀 ~ page ~ homeData:", homeData)
 
   const Top3Services = homeData?.hourlyLeadsCount?.map(
     (item: { hour: number; count: any }) => ({

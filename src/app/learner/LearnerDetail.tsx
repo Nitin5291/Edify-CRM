@@ -59,10 +59,6 @@ const LearnerDetail = ({
   const Batch: HostItem[] = batchData?.map((item: any) => {
     return { lable: item?.batchName, value: item?.id };
   });
-  console.log("🚀 ~ constBatch:HostItem[]=batchData?.map ~ Batch:", Batch, SingleLearner?.batchId?.split(","), SingleLearner?.batchId?.split(",")?.map((item: any) => {
-    const data = Batch?.filter((i) => i?.value == item)
-    return data?.[0];
-  }))
 
   useEffect(() => {
     dispatch(getCourses());
@@ -111,10 +107,11 @@ const LearnerDetail = ({
 
   const handelonClear = () => {
     const filterData = {
-      ...SingleLearner /* , instalment1Screenshot: SingleLearner?.instalment1Screenshot?.[0], idProof: SingleLearner?.idProof?.[0], */, batchId: SingleLearner?.batchId?.split(",")?.length > 0 ? SingleLearner?.batchId?.split(",")?.map((item: any) => {
+      ...SingleLearner /* , instalment1Screenshot: SingleLearner?.instalment1Screenshot?.[0], idProof: SingleLearner?.idProof?.[0], */
+      , batchId: SingleLearner?.batchId != null && SingleLearner?.batchId?.split(",")?.map((item: any) => {
         const data = Batch?.filter((i) => i?.value == item)
         return data?.[0];
-      }) : []
+      })
     }
     console.log("🚀 ~ handelonClear ~ filterData:", filterData)
     setLearnerData(filterData);

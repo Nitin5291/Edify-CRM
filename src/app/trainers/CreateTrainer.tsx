@@ -135,7 +135,6 @@ const CreateTrainer = ({
       dispatch(createTrainer(data))
         .unwrap()
         .then((res: any) => {
-          debugger
           if (res) {
             toast.success(
               res?.message
