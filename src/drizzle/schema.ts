@@ -352,8 +352,8 @@ export const batch_lead = pgTable("batch_lead", {
 
 export const mainTasks = pgTable("main_tasks", {
   id: serial("id").primaryKey(),
-  taskOwner: integer("task_owner"),
-  assignTo: integer("assign_to"),
+  taskOwner: text("task_owner"),
+  assignTo: text("assign_to"),
   dueDate: timestamp("due_date"),
   subject: varchar("subject", { length: 255 }),
   source: varchar("source", { length: 255 }),

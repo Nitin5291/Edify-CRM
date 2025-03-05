@@ -38,11 +38,12 @@ const TaskDetail = ({
   };
   const { allUser } = useAppSelector((state) => state?.auth);
   const { singleMainTaskData } = useAppSelector((state) => state?.mainTask);
-  const { learnerData } = useAppSelector((state) => state?.learner);
+  let { learnerData } = useAppSelector((state) => state?.learner);
+  learnerData = learnerData?.learners
 
   const AssignToData: HostItem[] = allUser?.users?.map((item: any) => {
-    return { lable: item?.name, value: item?.id };
-  });
+    return { lable: item?.user_metadata?.name, value: item?.id };
+  })
 
   const learner: HostItem[] = learnerData?.map((item: any) => {
     return { lable: item?.name, value: item?.id };
@@ -188,8 +189,8 @@ const TaskDetail = ({
       const formData = new FormData();
 
       const data = {
-        taskOwner: trainerData?.taskOwner ? parseInt(trainerData?.taskOwner) : null,
-        assignTo: trainerData?.assignTo ? parseInt(trainerData?.assignTo) : null,
+        taskOwner: trainerData?.taskOwner ? trainerData?.taskOwner : null,
+        assignTo: trainerData?.assignTo ? trainerData?.assignTo : null,
         dueDate: trainerData?.dueDate ? trainerData?.dueDate : null,
         subject: trainerData?.subject ? trainerData?.subject : null,
         source: trainerData?.source ? trainerData?.source : null,

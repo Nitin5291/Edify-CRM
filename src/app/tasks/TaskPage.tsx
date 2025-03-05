@@ -47,8 +47,8 @@ const initialColumnDefs: ColDef[] = [
       const data = params.data;
       return (
         <div className="flex justify-center items-center capitalize w-full">
-          {data?.taskOwnerUser?.name
-            ? data?.taskOwnerUser?.name
+          {data?.taskOwner
+            ? data?.taskOwner
             : "-"}
         </div>
       );
@@ -65,8 +65,8 @@ const initialColumnDefs: ColDef[] = [
       const data = params.data;
       return (
         <div className="flex justify-center items-center capitalize w-full">
-          {data?.assignedUser?.name
-            ? data?.assignedUser?.name
+          {data?.assignTo
+            ? data?.assignTo
             : "-"}
         </div>
       );
@@ -175,14 +175,18 @@ const TaskPage = ({
   const [searchValue, setSearchValue] = useState<string>("");
   const [filterData, setFilterData] = useState<any>(TaskListView?.[0]?.value);
   const { nav } = useAppSelector((state) => state);
-  const { CoursesData } = useAppSelector((state) => state?.courses);
   const { mainTaskData, isLoader, isdelLoader } = useAppSelector((state) => state?.mainTask);
+  const { allUser } = useAppSelector((state) => state?.auth);
 
   useEffect(() => {
-    dispatch(getMainTask());
-    if (!(CoursesData?.courses?.length > 0)) {
-      dispatch(getCourses());
-    }
+    dispatch(getUser());
+    setTimeout(() => {
+      dispatch(getMainTask());
+    }, 1000);
+
+    // if (!(CoursesData?.courses?.length > 0)) {
+    //   dispatch(getCourses());
+    // }
   }, []);
 
   const onFirstDataRendered = React.useCallback((params: { api: { paginationGoToPage: (arg0: number) => void; }; }) => {
@@ -260,10 +264,10 @@ const TaskPage = ({
       const filterData = `userId=${getUserID()}`;
       dispatch(getFilterMainTask({ data: filterData }));
     } else if (data === "open_tasks") {
-      const filterData = `status=Inprogress`;
+      const filterData = `status=Active`;
       dispatch(getFilterMainTask({ data: filterData }));
     } else if (data === "closed_tasks") {
-      const filterData = `status=Completed`;
+      const filterData = `status=NotActive`;
       dispatch(getFilterMainTask({ data: filterData }));
     } else {
       dispatch(getMainTask());
@@ -311,14 +315,25 @@ const TaskPage = ({
 
   const filteredActivities = React.useMemo(() => {
     if (mainTaskData?.length > 0) {
-      const filtetData = activeFilter === "all" ? mainTaskData : mainTaskData?.filter((item: any) => item?.status === activeFilter)
+      const filterData = mainTaskData?.map((item: any) => {
+        return {
+          ...item,
+          assignTo: allUser?.users?.filter((i: any) => {
+            return i?.id == item?.assignTo
+          })?.[0]?.user_metadata?.name,
+          taskOwner: allUser?.users?.filter((i: any) => {
+            return i?.id == item?.taskOwner
+          })?.[0]?.user_metadata?.name
+        }
+      })
+      const filtetData = activeFilter === "all" ? filterData : filterData?.filter((item: any) => item?.status === activeFilter)
       if (searchValue) {
         return dataFilter(
           filtetData?.map((item: any) => ({
             ...item,
           })),
           searchValue,
-          ["taskType", "subject", "status", "priority"]
+          ["taskOwner", "assignTo", "taskType", "subject", "status", "priority"]
         );
       } else {
         return filtetData;
@@ -326,7 +341,7 @@ const TaskPage = ({
     } else {
       return [];
     }
-  }, [mainTaskData, searchValue, activeFilter,filterData]);
+  }, [mainTaskData, searchValue, activeFilter, filterData]);
 
 
   const handelOnTableFilterChange = (data: string) => {

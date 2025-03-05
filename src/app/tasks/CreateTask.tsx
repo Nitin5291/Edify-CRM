@@ -25,23 +25,22 @@ const CreateTask = ({
   handelOnContactModel: () => void;
 }) => {
   const [trainer, setTrainer] = useState<BatchData>({});
-  console.log("🚀 ~ trainer:", trainer)
   const [error, setError] = useState<BatchData>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { allUser } = useAppSelector((state) => state?.auth);
-  const { learnerData } = useAppSelector((state) => state?.learner);
-
+  let { learnerData } = useAppSelector((state) => state?.learner);
+  learnerData = learnerData?.learners
   const AssignToData: HostItem[] = allUser?.users?.map((item: any) => {
-    return { lable: item?.name, value: item?.id };
-  });
+    return { lable: item?.user_metadata?.name, value: item?.id };
+  })
   const learner: HostItem[] = learnerData?.map((item: any) => {
     return { lable: item?.name, value: item?.id };
   });
 
   useEffect(() => {
     dispatch(getLearner());
-    dispatch(getUser());
+    // dispatch(getUser());
     handelOnStaticData();
     setTrainer({ ...trainer, taskOwner: getUserID() })
   }, []);
@@ -111,8 +110,8 @@ const CreateTask = ({
     if (vaidation()) {
       setIsLoading(true);
       const data = {
-        taskOwner: trainer?.taskOwner ? parseInt(trainer?.taskOwner) : null,
-        assignTo: trainer?.assignTo ? parseInt(trainer?.assignTo) : null,
+        taskOwner: trainer?.taskOwner ? trainer?.taskOwner : null,
+        assignTo: trainer?.assignTo ? trainer?.assignTo : null,
         dueDate: trainer?.dueDate ? trainer?.dueDate : null,
         subject: trainer?.subject ? trainer?.subject : null,
         source: trainer?.source ? trainer?.source : null,
@@ -120,7 +119,7 @@ const CreateTask = ({
         learnerId: trainer?.learnerId ? trainer?.learnerId : null,
         batch: trainer?.batch ? trainer?.batch : null,
         priority: trainer?.priority ? trainer?.priority : null,
-        status: trainer?.status ? trainer?.status : "Inprogress",
+        status: trainer?.status ? trainer?.status : "NotActive",
         location: trainer?.location ? trainer?.location : null,
         slackStage: trainer?.slackStage ? trainer?.slackStage : null,
         trainerId: trainer?.trainerId ? trainer?.trainerId : null,
@@ -132,6 +131,7 @@ const CreateTask = ({
       dispatch(createMainTask(data))
         .unwrap()
         .then((res: any) => {
+          debugger
           if (res) {
             toast.success(
               res?.message

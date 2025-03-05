@@ -182,10 +182,10 @@ const Note = ({ name, id }: { name?: string; id?: number }) => {
       content: noteData,
       learnerId: id,
       userId: getUserID()
-    } : name&& {
+    } : name && {
+      userId: getUserID(),
       content: noteData,
       [name]: id || SingleLead?.id,
-      userId: getUserID()
     };
     dispatch(addNote(data))
       .unwrap()

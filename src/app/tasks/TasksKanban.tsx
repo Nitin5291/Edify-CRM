@@ -7,10 +7,22 @@ import { getMainTask, updateMainTask } from "@/lib/features/mainTask/mainTaskSli
 const TasksKanban = () => {
   const [tasks, setTasks] = useState<any>([]);
   const { mainTaskData } = useAppSelector((state) => state?.mainTask);
+  const { allUser } = useAppSelector((state) => state?.auth);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    setTasks(mainTaskData);
+    const dataFilter = mainTaskData?.map((item: any) => {
+      return {
+        ...item,
+        assignTo: allUser?.users?.filter((i: any) => {
+          return i?.id == item?.assignTo
+        })?.[0]?.user_metadata?.name,
+        taskOwner: allUser?.users?.filter((i: any) => {
+          return i?.id == item?.taskOwner
+        })?.[0]?.user_metadata?.name
+      }
+    })
+    setTasks(dataFilter);
   }, [mainTaskData]);
 
   const onDragStart = (evt: {
@@ -115,7 +127,7 @@ const TasksKanban = () => {
     (data: { status: string }) => data?.status === "Active"
   );
   let waiting = tasks?.filter(
-    (data: { status: string }) => data?.status === "Inactive"
+    (data: { status: string }) => data?.status === "NotActive"
   );
 
   return (
@@ -135,8 +147,8 @@ const TasksKanban = () => {
           designStatus={3}
         />
         <KanbanCard
-          headerName="Inactive"
-          name="Inactive"
+          headerName="NotActive"
+          name="NotActive"
           title="Tasks"
           onDragLeave={onDragLeave}
           onDragEnter={onDragEnter}

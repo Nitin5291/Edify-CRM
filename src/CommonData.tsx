@@ -24,7 +24,7 @@ export const navigation = [
   // // { name: "Courses", href: "/courses", current: false },
   // // { name: "Ask AI", href: "/ask_aI", current: true },
   // // { name: "Activities", href: "#", current: false },
-  // { name: "Tasks", href: "/tasks", current: false },
+  { name: "Tasks", href: "/tasks", current: false },
   // { name: "Analytics", href: "/analytics", current: false },
 ];
 
@@ -76,8 +76,8 @@ export const TrainerStatus = [
   "NotActive",
 ];
 export const TaskStatus = [
-  "Inprogress",
-  "Completed",
+  "Active",
+  "NotActive",
 ];
 export const ModeOfClassList = [
   "Online",

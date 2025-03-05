@@ -121,7 +121,7 @@ const Activity = () => {
       </div>
 
       {activityStatus === "activity" ? (
-        <ActivityAccordion />
+        <ActivityAccordion name="mainTaskId" id={singleMainTaskData?.id} />
       ) : activityStatus === "new_task" ? (
         <NewTask name="mainTaskId" id={singleMainTaskData?.id} />
       ) : activityStatus === "new_meeting" ? (

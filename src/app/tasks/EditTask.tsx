@@ -7,13 +7,13 @@ import { useAppDispatch, useAppSelector } from "@/lib/store";
 import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { getSingleUser, getUser } from "@/lib/features/auth/authSlice";
 import AskAI from "../ask_aI/AskAI";
-import Note from "../leads/Note";
 import TaskDetail from "./TaskDetail";
 import BatchesPage from "./BatchesPage";
 import Activity from "./Activity";
 import { getSingleTrainers } from "@/lib/features/trainer/trainerSlice";
 import { getSingleMainTask } from "@/lib/features/mainTask/mainTaskSlice";
 import moment from "moment";
+import Note from "../leads/Note";
 
 const EditTask = ({
   handelOnSet,
@@ -26,6 +26,10 @@ const EditTask = ({
   const [activeTab, setActiveTab] = useState<String>("Details");
   const { singleMainTaskData } = useAppSelector((state) => state?.mainTask);
   const { allUser } = useAppSelector((state) => state?.auth);
+  
+  // const AssignToData: HostItem[] = allUser?.users?.map((item: any) => {
+  //   return { lable: item?.user_metadata?.name, value: item?.id };
+  // })
 
   useMemo(() => {
     if (task?.[0]?.id) {
@@ -42,10 +46,10 @@ const EditTask = ({
 
   const assignToName = allUser?.users?.filter((item: any) => {
     return item?.id == singleMainTaskData?.assignTo
-  })?.[0]?.name;
+  })?.[0]?.user_metadata?.name;
   const taskOwner = allUser?.users?.filter((item: any) => {
     return item?.id == singleMainTaskData?.taskOwner
-  })?.[0]?.name;
+  })?.[0]?.user_metadata?.name;
   return (
     <div className="w-[fit-content] lg:w-full">
       <div className="m-5 rounded-lg sborder-4 border-zinc-100 shadow-lg">
@@ -60,7 +64,7 @@ const EditTask = ({
             <div className="flex gap-3 items-center">
               <Image src={Contact} alt="Contact icon" />
               <h2 className="text-black text-lg font-semibold">
-                {singleMainTaskData?.taskOwner}
+                {taskOwner}
               </h2>
             </div>
           </div>

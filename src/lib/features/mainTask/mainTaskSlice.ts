@@ -1,5 +1,6 @@
 import { del, get, post, put } from "@/base";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface MainTaskState {
   loading: "idle" | "pending" | "fulfilled" | "rejected";
@@ -23,8 +24,8 @@ export const createMainTask = createAsyncThunk(
   "createMainTask",
   async (body: any) => {
     try {
-      const response = await post("mainTask", body);
-      return response;
+      const response = await axios.post("/api/mainTask", body);
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -33,8 +34,8 @@ export const createMainTask = createAsyncThunk(
 
 export const getMainTask = createAsyncThunk("getMainTask", async () => {
   try {
-    const response = await get(`mainTask`);
-    return response;
+    const response = await axios.get(`/api/mainTask`);
+    return response?.data?.data;
   } catch (error: any) {
     throw new Error(error.response.data);
   }
@@ -44,8 +45,8 @@ export const getFilterMainTask = createAsyncThunk(
   "getFilterMainTask",
   async ({ data }: { data?: string }) => {
     try {
-      const response = await get(`mainTask?${data}`);
-      return response;
+      const response = await axios.get(`/api/mainTask?${data}`);
+      return response?.data?.data;
     } catch (error: any) {
       throw new Error(error.response.data);
     }
@@ -56,8 +57,8 @@ export const updateMainTask = createAsyncThunk(
   "updateMainTask",
   async (data: any) => {
     try {
-      const response = await put(`mainTask/${data?.id}`, data?.data);
-      return response;
+      const response = await axios.put(`/api/mainTask?id=${data?.id}`, data?.data);
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -68,8 +69,8 @@ export const deleteMainTaskData = createAsyncThunk(
   "/deleteMainTaskData",
   async (ids: any) => {
     try {
-      const response = await del(`mainTask?ids=${ids}`);
-      return response;
+      const response = await axios.delete(`/api/mainTask?ids=${ids}`);
+      return response?.data;
     } catch (error: any) {
       throw new Error(JSON.stringify(error.response.data));
     }
@@ -80,8 +81,8 @@ export const getSingleMainTask = createAsyncThunk(
   "getSingleMainTask",
   async (id: number) => {
     try {
-      const response = await get(`mainTask/${id}`);
-      return response;
+      const response = await axios.get(`/api/mainTask?id=${id}`);
+      return response?.data?.data;
     } catch (error: any) {
       // If an error occurs, return the error response data
       throw new Error(error.response.data);

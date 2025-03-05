@@ -12,7 +12,6 @@ const Page = () => {
     const [id, setID] = useState<number>(-1);
     const [pagination, setPagination] = useState<number>(0);
     const [activeFilter, setActiveFilter] = useState<string>('all')
-    const dispatch = useAppDispatch()
     const searchParams = useSearchParams();
     const router = useRouter();
     const queryID = searchParams.get('ids');
